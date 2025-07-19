@@ -6,4 +6,5 @@ node_modules
 /.mf
 .env
 .shopify
+.cursor
 .react-router

@@ -13,6 +13,9 @@ export default defineConfig({
     reactRouter(),
     tsconfigPaths(),
   ],
+  server: {
+    allowedHosts: ['2fb33b5aa0c1.ngrok-free.app']
+  },
   build: {
     // Allow a strict Content-Security-Policy
     // withtout inlining assets as base64:
