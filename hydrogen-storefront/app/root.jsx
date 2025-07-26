@@ -172,8 +172,10 @@ export function Layout({children}) {
         ) : (
           children
         )}
+        
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
+        <div id="product-colors-modal-root"></div>
       </body>
     </html>
   );

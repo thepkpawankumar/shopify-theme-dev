@@ -1,4 +1,5 @@
 import {useLoaderData} from 'react-router';
+
 import {
   getSelectedProductOptions,
   Analytics,
@@ -26,6 +27,17 @@ export const meta = ({data}) => {
   ];
 };
 
+
+export const links = () => {
+
+  return [
+    {
+      rel: 'stylesheet',
+      href: '/app/styles/product-colors.css'
+    }
+  ]
+}
+
 /**
  * @param {LoaderFunctionArgs} args
  */
@@ -48,17 +60,78 @@ async function loadCriticalData({context, params, request}) {
   const {handle} = params;
   const {storefront} = context;
 
-
   if (!handle) {
     throw new Error('Expected product handle to be defined');
   }
 
+  
+  const PRODUCT_COLORS_QUERY = `#graphql
+  query GetColorGroups {
+  metaobjects(type: "product_color_groups", first: 100) {
+    edges {
+      node {
+        handle
+        fields {
+          key
+          value
+        }
+      }
+    }
+  }
+}`;
+
+const COLOR_PRODUCT_QUERY = `#graphql
+  query GetProductsByIds($ids: [ID!]!) {
+    nodes(ids: $ids) {
+      ... on Product {
+        id
+        title
+        handle
+        featuredImage {
+          altText
+          id
+          url
+        }
+      }
+    }
+  }`;
   const [{product}] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
       variables: {handle, selectedOptions: getSelectedProductOptions(request)},
     }),
     // Add other queries here, so that they are loaded in parallel
   ]);
+
+const {metaobjects: {edges: groupDetail}} = await storefront.query(PRODUCT_COLORS_QUERY);
+
+  let color_group = [];
+
+  for (const group of groupDetail) {
+    const {node: group_data} = group;
+
+    let products_ids = group_data?.fields.find(field => field.key === "products_list")?.value || [];
+    if(!products_ids) {
+      continue;
+    }
+    products_ids = JSON.parse(products_ids);
+
+    const {nodes: color_products} = await storefront.query(COLOR_PRODUCT_QUERY, {
+      variables :{
+        ids: products_ids
+      }
+    });
+
+    if(!color_products) {
+      continue;
+    }
+    const color_product_ids = color_products?.map(color_product => color_product.id) || [];
+    if(color_product_ids?.includes(product.id)){
+
+      color_group = color_products;
+      break;
+    }
+    
+  }
 
   if (!product?.id) {
     throw new Response(null, {status: 404});
@@ -69,6 +142,7 @@ async function loadCriticalData({context, params, request}) {
 
   return {
     product,
+    color_group
   };
 }
 
@@ -82,12 +156,15 @@ function loadDeferredData({context, params}) {
   // Put any API calls that is not critical to be available on first page render
   // For example: product reviews, product recommendations, social feeds.
 
+  const {storefront} = context;
+
+
   return {};
 }
 
 export default function Product() {
   /** @type {LoaderReturnData} */
-  const {product} = useLoaderData();
+  const {product, color_group} = useLoaderData();
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -120,6 +197,7 @@ export default function Product() {
         <ProductForm
           productOptions={productOptions}
           selectedVariant={selectedVariant}
+          color_group={color_group}
         />
         <br />
         <br />

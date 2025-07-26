@@ -1,14 +1,16 @@
 import {Link, useNavigate} from 'react-router';
 import {AddToCartButton} from './AddToCartButton';
 import {useAside} from './Aside';
+import { ProductColors } from './ProductColors';
 
 /**
  * @param {{
  *   productOptions: MappedProductOptions[];
  *   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
+ * color_group
  * }}
  */
-export function ProductForm({productOptions, selectedVariant}) {
+export function ProductForm({productOptions, selectedVariant, color_group}) {
   const navigate = useNavigate();
   const {open} = useAside();
   return (
@@ -18,10 +20,12 @@ export function ProductForm({productOptions, selectedVariant}) {
         if (option.optionValues.length === 1) return null;
 
         return (
+          <div key="product-options-and-colors">
           <div className="product-options" key={option.name}>
             <h5>{option.name}</h5>
             <div className="product-options-grid">
               {option.optionValues.map((value) => {
+
                 const {
                   name,
                   handle,
@@ -93,6 +97,9 @@ export function ProductForm({productOptions, selectedVariant}) {
             </div>
             <br />
           </div>
+           <ProductColors color_group={color_group} key="product-colors"/>
+          </div>
+        
         );
       })}
       <AddToCartButton
