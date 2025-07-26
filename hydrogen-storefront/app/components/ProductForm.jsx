@@ -2,17 +2,23 @@ import {Link, useNavigate} from 'react-router';
 import {AddToCartButton} from './AddToCartButton';
 import {useAside} from './Aside';
 import { ProductColors } from './ProductColors';
+import { useState } from 'react';
+import Modal from './Modal';
 
 /**
  * @param {{
  *   productOptions: MappedProductOptions[];
  *   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
  * color_group
+ * size_chart
  * }}
  */
-export function ProductForm({productOptions, selectedVariant, color_group}) {
+export function ProductForm({productOptions, selectedVariant, color_group, size_chart}) {
   const navigate = useNavigate();
   const {open} = useAside();
+
+  const sizeLables = ["size"];
+  const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
   return (
     <div className="product-form">
       {productOptions.map((option) => {
@@ -22,7 +28,15 @@ export function ProductForm({productOptions, selectedVariant, color_group}) {
         return (
           <div key="product-options-and-colors">
           <div className="product-options" key={option.name}>
-            <h5>{option.name}</h5>
+
+            {sizeLables.includes(option.name.toLowerCase()) && size_chart ? 
+            <div className="flex justify-between">
+              <h5>{option.name}</h5>
+               <button onClick={() => setIsSizeChartOpen(true)}>Size chart</button>
+              </div>
+            : <h5>{option.name}</h5>
+          }
+            
             <div className="product-options-grid">
               {option.optionValues.map((value) => {
 
@@ -98,6 +112,15 @@ export function ProductForm({productOptions, selectedVariant, color_group}) {
             <br />
           </div>
            <ProductColors color_group={color_group} key="product-colors"/>
+           {size_chart && <Modal isOpen={isSizeChartOpen} setIsOpen={setIsSizeChartOpen}>
+
+           <h2 className="text-lg sm:text-xl font-semibold mb-4">{size_chart.title}</h2>
+               
+           <div dangerouslySetInnerHTML={{__html: size_chart.body}} />
+           
+             
+            </Modal>}
+           
           </div>
         
         );

@@ -45,6 +45,9 @@ export const PRODUCT_FRAGMENT = `#graphql
     descriptionHtml
     description
     encodedVariantExistence
+    size_chart:metafield(namespace:"custom", key:"size_chart") {
+          value
+        }
     encodedVariantAvailability
     options {
       name

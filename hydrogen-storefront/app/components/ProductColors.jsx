@@ -3,7 +3,7 @@ import { Link } from "react-router"
 import { ProductColorsModal } from "./ProductColorsModal";
 import { useState } from "react";
 
-function ProductColorItem({product, onClose}) {
+function ProductColorItem({product, onClose, showTitle}) {
    return  <div className="product-color-thumbnail" key={product.id}>
     <Link to={`/products/${product.handle}`} onClick={onClose}>
     <Image
@@ -13,7 +13,7 @@ function ProductColorItem({product, onClose}) {
     key={product.featuredImage.id}
     sizes="(min-width: 45em) 50vw, 100vw"
     />
-    <h2 className="ProductMeta__Title Heading u-h2 hidden">{product.title}</h2>
+    <h2 className={"ProductMeta__Title pt-4 font-light"+ (!showTitle ? " hidden": "")}>{product.title}</h2>
 
     </Link>
     </div>
@@ -46,7 +46,7 @@ export function ProductColors({ color_group }) {
                         <u>More Colors</u>
                     </span>
                     <Image src="https://cdn.shopify.com/s/files/1/0635/7558/8960/files/arrow_forward_ios.png?v=1750788030"
-                    width={"auto"}
+                      sizes="(min-width: 45em) 3vw, 3vw"
                     />
                   
                 </a>
@@ -58,7 +58,7 @@ export function ProductColors({ color_group }) {
        
        <div className="">
         <div className="product-color-thumbnail-wrapper">
-       {color_group.map(product => <ProductColorItem key={product.id} product={product}
+       {color_group.map(product => <ProductColorItem showTitle={true} key={product.id} product={product}
        onClose={() => setModalOpen(false)}
        />)}
         </div>            

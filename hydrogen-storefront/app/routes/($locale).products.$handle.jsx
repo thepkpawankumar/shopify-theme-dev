@@ -95,6 +95,16 @@ const COLOR_PRODUCT_QUERY = `#graphql
       }
     }
   }`;
+
+ const PAGE_CONTENT_QUERY =  `#graphql
+  query getPageDetails($id: ID!) {
+   page(id: $id) {
+    title
+    body
+ 
+ }
+  }`;
+
   const [{product}] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
       variables: {handle, selectedOptions: getSelectedProductOptions(request)},
@@ -133,6 +143,20 @@ const {metaobjects: {edges: groupDetail}} = await storefront.query(PRODUCT_COLOR
     
   }
 
+  const page_id = 'gid://shopify/Page/'+product.size_chart?.value.replace("gid://shopify/OnlineStorePage/", "");
+
+    const {page} = await storefront.query(`#graphql
+  query getPageDetails($id: ID!) {
+   page(id: $id) {
+    title
+    body
+  }
+  }`, {
+      variables: {
+        id: page_id
+      }
+    });
+
   if (!product?.id) {
     throw new Response(null, {status: 404});
   }
@@ -142,7 +166,8 @@ const {metaobjects: {edges: groupDetail}} = await storefront.query(PRODUCT_COLOR
 
   return {
     product,
-    color_group
+    color_group,
+    size_chart: page || null
   };
 }
 
@@ -164,7 +189,7 @@ function loadDeferredData({context, params}) {
 
 export default function Product() {
   /** @type {LoaderReturnData} */
-  const {product, color_group} = useLoaderData();
+  const {product, color_group, size_chart} = useLoaderData();
 
   // Optimistically selects a variant with given available variant information
   const selectedVariant = useOptimisticVariant(
@@ -198,6 +223,7 @@ export default function Product() {
           productOptions={productOptions}
           selectedVariant={selectedVariant}
           color_group={color_group}
+          size_chart={size_chart}
         />
         <br />
         <br />

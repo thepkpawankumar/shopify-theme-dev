@@ -111,6 +111,8 @@ a#product-colors-open-popup-button img {
     align-items: center;
     .ProductMeta__Title {
       font-size: 14px;
+      font-weight: 500;
+      padding-top: 0.5rem;
     }
 }
   .color__selected_optionn {
