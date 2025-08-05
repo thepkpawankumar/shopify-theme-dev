@@ -1,0 +1,21 @@
+{% doc %}
+This is an example snippet
+@param {number} param1
+@param {string} param2
+@param {string} [param3]
+
+@example 
+{% render 'example-snippet', param1: 12, param2: "param2", param3: "param3" %}
+
+@example 
+{% render 'example-snippet', 
+    param1: 34, 
+    param2: "param2"
+%}
+
+{% enddoc %}
+
+
+Number: {{ param1 }}
+String: {{ param2 }}
+String 2: {{ param3 }}
